@@ -1,7 +1,7 @@
 
 setup:
 	pip install -r requirements.txt
-	apt-get install -y pandoc
+	sudo apt-get install -y pandoc
 
 directory:
 	mkdir -p site/
