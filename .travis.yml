@@ -12,6 +12,7 @@ script:
 deploy:
     provider: pages
     token: $GITHUB_TOKEN
+    local_dir: build/
     skip_cleanup: false
     keep_history: true
     on:

@@ -1,7 +1,11 @@
 
+directory:
+	mkdir -p build/
+
 check:
 	pytest
 
-generate:
-	pandoc README.md -o index.html
+generate: directory
+	python example_plot.py build/example_plot.png
+	pandoc README.md -o build/index.html
 
