@@ -1,2 +1,3 @@
 # circleci-data-science
-Testing out CIrcleCI for Simulations and Analysis
+
+Testing out CI tools for Simulations and Analysis
