@@ -10,9 +10,9 @@ script:
     - make check
     - make generate
 deploy:
-    provider: pages:git
+    provider: pages
     token: $GITHUB_TOKEN
-    cleanup: false
+    skip_cleanup: false
     keep_history: true
     on:
         branch: master
