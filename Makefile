@@ -20,6 +20,6 @@ check:
 	pytest
 
 generate: directory
-	python example_plot.py site/example_plot.png
+	python sir.py
 	asciidoctor index.adoc -o site/index.html
 
