@@ -7,7 +7,7 @@ directory:
 	mkdir -p site/
 
 lint:
-	pylint *.py
+	pycodestyle *.py
 
 check:
 	pytest
