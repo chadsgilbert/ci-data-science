@@ -5,13 +5,14 @@ python:
     - "3.8"
 install:
     - pip install -r requirements.txt
+    - apt-get install pandoc
 script:
     - make check
     - make generate
 deploy:
-    provider: pages
-    skip_cleanup: true
-    github_token: $GITHUB_TOKEN
+    provider: pages:git
+    token: $GITHUB_TOKEN
+    cleanup: false
     keep_history: true
     on:
         branch: master
