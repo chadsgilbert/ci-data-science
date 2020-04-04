@@ -1,3 +1,3 @@
-# circleci-data-science
+# Sample GitHub Page
 
-Testing out CI tools for Simulations and Analysis
+Generating this from pandoc through Travis CI onto GitHub pages.
