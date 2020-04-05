@@ -60,13 +60,10 @@ while (R < (N - 1)) or (T > 1000.0):
 print(T)
 print(R)
 
-FIG = plt.figure()
-AX1 = FIG.add_subplot(3, 1, 1)
-AX2 = FIG.add_subplot(3, 1, 2)
-AX3 = FIG.add_subplot(3, 1, 3)
-
-AX1.plot(tt, ss)
-AX2.plot(tt, ii)
-AX3.plot(tt, rr)
-
+fig = plt.figure()
+fig.set_size_inches(10, 5)
+plt.plot(tt, ss)
+plt.plot(tt, ii)
+plt.plot(tt, rr)
+plt.legend(['Susceptible', 'Infected', 'Recovered'])
 plt.savefig("site/sir.png")
