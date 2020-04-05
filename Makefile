@@ -14,7 +14,7 @@ directory:
 	mkdir -p site/
 
 lint:
-	pycodestyle *.py
+	pycodestyle *.py --ignore=E741
 
 check:
 	pytest
