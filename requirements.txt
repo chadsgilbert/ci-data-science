@@ -1,5 +1,6 @@
 attrs==19.3.0
 cycler==0.10.0
+h5py==2.10.0
 importlib-metadata==1.6.0
 Jinja2==2.11.1
 kiwisolver==1.2.0

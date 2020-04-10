@@ -1,4 +1,5 @@
 
+.PHONY: all
 all: site/sir.png \
 	site/index.html \
 	site/map/pipeline.png \
@@ -9,17 +10,22 @@ setup:
 	pip install -r requirements.txt
 	sudo apt-get update && sudo apt-get install -y asciidoctor 
 
+.PHONY: lint
+lint: sir/sir
+	pycodestyle sir/sir --ignore=E741
+
+.PHONY: check
+check: sir/sir
+	pytest sir/*
+
 directory:
 	mkdir -p site/ && mkdir -p site/map
 
-lint:
-	pycodestyle *.py --ignore=E741
+sir/output.h5: sir/sir
+	sir/sir simulate sir/output.h5
 
-check:
-	pytest
-
-site/sir.png: directory lint check sir.py
-	python sir.py
+site/sir.png: sir/output.h5
+	sir/sir plot sir/output.h5
 
 site/index.html: directory index.adoc 
 	asciidoctor index.adoc -o $@

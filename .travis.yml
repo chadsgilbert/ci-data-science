@@ -8,7 +8,7 @@ install:
 script:
     - make lint
     - make check
-    - make generate
+    - make
 deploy:
     provider: pages
     token: $GITHUB_TOKEN
