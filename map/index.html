@@ -5,8 +5,7 @@
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="generator" content="Asciidoctor 1.5.5">
-<meta name="author" content="Chad Gilbert">
-<title>The Pandemic Simulation</title>
+<title>Site Map</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
 <style>
 /* Asciidoctor default stylesheet | MIT License | http://asciidoctor.org */
@@ -421,67 +420,17 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </head>
 <body class="article">
 <div id="header">
-<h1>The Pandemic Simulation</h1>
-<div class="details">
-<span id="author" class="author">Chad Gilbert</span><br>
-</div>
+<h1>Site Map</h1>
 </div>
 <div id="content">
-<div id="preamble">
-<div class="sectionbody">
 <div class="paragraph">
-<p>Here we walk though simulating a pandemic. In the sections that follow, I will
-describe different ways of considering how an infectious disease can propagate
-through a population.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_analysis_pipeline">Analysis Pipeline</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>To see the pipeline that supports this analysis, look <a href="map/index.html">here</a>.</p>
-</div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_the_susceptible_infected_recovered_sir_model">The Susceptible, Infected, Recovered (SIR) Model</h2>
-<div class="sectionbody">
-<div class="paragraph">
-<p>In this first model, we&#8217;ll imagine that a new virus appears to which the entire
-population (\(N\)) is susceptible. The number of susceptible people
-(\(S\)) decreases as they become infected. For a spatially mixed population,
-the likelihood of a susceptible person encountering an infectious person is
-proportional to \(S I / N\). For now, consider \(\beta\) to just be a
-scalar rate of infection. Once someone recovers from the infection, they are
-deemed no longer to be susceptible to the virus. We will count the number of
-people who are recovered, \(R\). Let \(\gamma\) be the rate at which
-infected people recover from the virus.</p>
-</div>
-<div class="paragraph">
-<p>This model give the equations:</p>
-</div>
-<div id="number" class="stemblock">
-<div class="content">
-\[\frac{dS}{dt} = -\frac{\beta I S}{N} \\
-
-\frac{dI}{dt} = \frac{\beta I S}{N} - \gamma I \\
-
-R' = \gamma I \\
-
-S + I + R = N \\\]
-</div>
-</div>
-<div class="paragraph">
-<p>For simplicity, we solve this using Euler&#8217;s method.</p>
+<p>This is the set of dependencies for this project.</p>
 </div>
 <div class="imageblock">
 <div class="content">
-<img src="sir.png" alt="A matplotlib graph">
+<img src="pipeline.png" alt="Analysis pipeline">
 </div>
-<div class="title">Figure 1. An image</div>
-</div>
-</div>
+<div class="title">Figure 1. The analysis pipeline for this project.</div>
 </div>
 </div>
 <div id="footer">
@@ -489,21 +438,5 @@ S + I + R = N \\\]
 Last updated 2020-04-10 20:32:34 UTC
 </div>
 </div>
-<script type="text/x-mathjax-config">
-MathJax.Hub.Config({
-  messageStyle: "none",
-  tex2jax: {
-    inlineMath: [["\\(", "\\)"]],
-    displayMath: [["\\[", "\\]"]],
-    ignoreClass: "nostem|nolatexmath"
-  },
-  asciimath2jax: {
-    delimiters: [["\\$", "\\$"]],
-    ignoreClass: "nostem|noasciimath"
-  },
-  TeX: { equationNumbers: { autoNumber: "none" } }
-});
-</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.6.0/MathJax.js?config=TeX-MML-AM_HTMLorMML"></script>
 </body>
 </html>
