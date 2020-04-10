@@ -8,7 +8,7 @@ all: site/sir.png \
 .PHONY: setup
 setup:
 	pip install -r requirements.txt
-	sudo apt-get update && sudo apt-get install -y asciidoctor
+	sudo apt-get update && sudo apt-get install -y asciidoctor graphviz
 	mkdir -p site/map
 
 .PHONY: lint
