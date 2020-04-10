@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 pytest-env/
+*.h5
 
 # C extensions
 *.so

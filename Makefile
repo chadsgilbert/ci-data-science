@@ -8,7 +8,8 @@ all: site/sir.png \
 .PHONY: setup
 setup:
 	pip install -r requirements.txt
-	sudo apt-get update && sudo apt-get install -y asciidoctor 
+	sudo apt-get update && sudo apt-get install -y asciidoctor
+	mkdir -p site/map
 
 .PHONY: lint
 lint: sir/sir
@@ -16,10 +17,6 @@ lint: sir/sir
 
 .PHONY: check
 check: sir/sir
-	pytest sir/*
-
-directory:
-	mkdir -p site/ && mkdir -p site/map
 
 sir/output.h5: sir/sir
 	sir/sir simulate sir/output.h5
@@ -27,14 +24,20 @@ sir/output.h5: sir/sir
 site/sir.png: sir/output.h5
 	sir/sir plot sir/output.h5
 
-site/index.html: directory index.adoc 
+site/index.html: index.adoc 
 	asciidoctor index.adoc -o $@
 
-site/map/pipeline.png: directory Makefile
+site/map/pipeline.png: Makefile
 	makefile2dot <Makefile | dot -Tpng > $@
 
-site/map/index.html: directory map/index.adoc
+site/map/index.html: map/index.adoc
 	asciidoctor map/index.adoc -o $@
+
+site: site/index.html \
+	site/sir.png \
+	site/map/index.html \
+	site/map/pipeline.png
+
 
 .PHONY: clean
 clean:
