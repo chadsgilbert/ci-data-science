@@ -1,9 +1,6 @@
 
 .PHONY: all
-all: site/sir.png \
-	site/index.html \
-	site/map/pipeline.png \
-	site/map/index.html
+all: site
 
 .PHONY: setup
 setup:
@@ -18,11 +15,17 @@ lint: sir/sir
 .PHONY: check
 check: sir/sir
 
-sir/output.h5: sir/sir
-	sir/sir simulate sir/output.h5
+sir/case1.h5: sir/sir
+	sir/sir simulate $@ --beta 0.04 --gamma 0.01
 
-site/sir.png: sir/output.h5
-	sir/sir plot sir/output.h5
+sir/case2.h5: sir/sir
+	sir/sir simulate $@ --beta 0.08 --gamma 0.04
+
+site/case1.png: sir/case1.h5
+	sir/sir plot sir/case1.h5 $@
+
+site/case2.png: sir/case2.h5
+	sir/sir plot sir/case2.h5 $@
 
 site/index.html: index.adoc 
 	asciidoctor index.adoc -o $@
@@ -34,10 +37,10 @@ site/map/index.html: map/index.adoc
 	asciidoctor map/index.adoc -o $@
 
 site: site/index.html \
-	site/sir.png \
+	site/case1.png \
+	site/case2.png \
 	site/map/index.html \
 	site/map/pipeline.png
-
 
 .PHONY: clean
 clean:
