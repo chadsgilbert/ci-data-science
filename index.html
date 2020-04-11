@@ -425,14 +425,167 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <div class="details">
 <span id="author" class="author">Chad Gilbert</span><br>
 </div>
+<div id="toc" class="toc">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#_goals">Goals</a></li>
+<li><a href="#_general_approach">General Approach</a>
+<ul class="sectlevel2">
+<li><a href="#_data">Data</a></li>
+<li><a href="#_content">Content</a></li>
+<li><a href="#_software">Software</a></li>
+<li><a href="#_operating_system">Operating System</a></li>
+<li><a href="#_hardware">Hardware</a></li>
+</ul>
+</li>
+<li><a href="#_analysis_pipeline">Analysis Pipeline</a></li>
+<li><a href="#_the_susceptible_infected_recovered_sir_model">The Susceptible, Infected, Recovered (SIR) Model</a></li>
+</ul>
+</div>
 </div>
 <div id="content">
 <div id="preamble">
 <div class="sectionbody">
 <div class="paragraph">
-<p>Here we walk though simulating a pandemic. In the sections that follow, I will
+<p>Here I walk though some simple studies in epidemiological dynamics by
+investigating several different epidemiological models, and anlysing key
+dynamics of these models using simulation. In the sections that follow, I will
 describe different ways of considering how an infectious disease can propagate
 through a population.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_goals">Goals</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Although I am interested in understanding epidemiology, the true goal of this
+project is to practice and demonstrate a particular methodology for writing
+analytical reports. The challenge with currently popular workflows for
+conducting and reporting on technical anlayses is that it is very easy to lose
+track of the process that was used to produce the analysis or report, to lose
+the ability to reproduce it, and to make mistakes that can never be recovered,
+checked, or revisited. Microsoft&#8217;s Office desktop productivity suite is the
+worst offender, but even workflows using better tools can easily come up short
+of reproducibility and re-usability.</p>
+</div>
+<div class="paragraph">
+<p>There is no literature that I have been able to find that focuses on this kind
+of technical research for the Enterprise, though I&#8217;m sure many of the practices
+I&#8217;m trying to learn have been learned in industry before. However, the topic of
+reproducible research has recently become popular in academia. Two such books
+on the topic that are openly available are
+<a href="https://the-turing-way.netlify.com/">The Turing Way</a> and
+<a href="https://www.practicereproducibleresearch.org/">The Practice of Reproducible
+Research</a>. Although these books frame the problem in a way that is not exactly
+aligned with my own interests, they both highlight many of the same challenges
+that I am concerned with, and provide excellent guidance on solving some of the
+issues.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_general_approach">General Approach</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The simplest way to ensure an analysis is reproducible is to frequently try to
+reproduce it from scratch. And the only way to make that acceptable is to
+automate it. So the general idea is very simple: we need to automate the
+simulations, automate post-processing of the simulations to produce figures and
+tables, and automate production of the document.</p>
+</div>
+<div class="paragraph">
+<p>Even with the process is automated, there are a lot of variables that can thwart
+attempts to reproduce an analysis. The result can change or the software can
+just plain fail unless the same versions of the data, content, software,
+operating system and sometimes even hardware are different. There are two
+possible approaches to supporting a reproduction: one, make it possible to
+obtain the exact same configuration, or two make the analysis such that it works
+the same on other configurations. The particular solution to the problem is
+different for each of the different kinds of input.</p>
+</div>
+<div class="sect2">
+<h3 id="_data">Data</h3>
+<div class="paragraph">
+<p>If data are used which cannot be reproduced, they should be stored somewhere
+known, where there is a single source of truth for it, and it should be
+immutable. There are internet archives designed for managing this, as well as
+specialized tools such as <a href="https://dvc.org">DVC</a>, which claim to solve this
+problem. I believe in some cases, something as simple as a zip archive stored
+on a web server with a known URI can be appropriate. Storage on a file system
+is less trustworthy, because it is hard to ensure that the data are never
+changed.</p>
+</div>
+<div class="paragraph">
+<p>One way to support assurance that datasets is to store a checksum of the data
+along side, and to store the checksum somewhere in the project. Then, when
+reproducing the analysis, it is easy to verify a matching checksum.</p>
+</div>
+<div class="paragraph">
+<p>The models in this repository are all simple and not trained from any real-world
+data, so this project does not demonstrate an approach to managing data.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_content">Content</h3>
+<div class="paragraph">
+<p>The content of the project is anything and everything that is a part of the
+project. This is likely to include program source code and the text of the
+report. The most popular tool for versioning this kind of content is <code>git</code>.</p>
+</div>
+<div class="paragraph">
+<p>Dubbed by its creator as "the stupid content tracker", git is useful for keeping
+track of and identifying any collection of files. Any kind of file can be
+tracked in a git repository, no complicated software has to be installed to
+use it, and no connectivity to an online service is required. In contrast to
+science, which is typically done out in the open on purpose, there are other
+types of analytical computing that has to be conducted entirely on a corporate
+premises, or even across an "air gap", with no internet connectivity of any
+kind. Using git to track such work is particularly useful, because it is capable
+of reconstructing and reconciling changes, even across an air gap.</p>
+</div>
+<div class="paragraph">
+<p>To support sharing of the content, plus integration with useful tools like
+Continuous Integration and Continuous Deployment pipelines a service such as
+GitHub or GitLab can be used. This project uses GitHub with GitHub Actions, and
+serves the site on GitHub Pages.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_software">Software</h3>
+<div class="paragraph">
+<p>Whereas custom code that supports the analysis should be stored as source in
+git, it doesn&#8217;t make sense to track third-party software in the same way.
+When using open source software, there are fantastic packaging ecosystems that
+can make it easy to install. Proprietary software can be more difficult. In
+this repository, only open source software is used. It will use python on
+Linux, with third-party libraries. Python&#8217;s standard package management server,
+<code>pypi</code>, is used with <code>pip</code> to install third-party dependencies.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_operating_system">Operating System</h3>
+<div class="paragraph">
+<p>The operating system provides the services and libraries required to run the
+software, and thus has to be considered in order to support reproducibility.
+Virtualization or containerization technologies can both support this to some
+extent. How this can all be managed is a large complex topic. In this project,
+I sidestep most of that by using GitHub actions, which provides a reliable
+environment. It isn&#8217;t perfect, however. It is conceivalbe that software
+updates applied to the virtual machines could change a low level library and
+alter the behaviour of my code or other software. Reproducibility is a
+matter of degree.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_hardware">Hardware</h3>
+<div class="paragraph">
+<p>The hardware that supports the computation here is commodity hardware, a
+standard <code>x86_46</code> CPU should be quite reliable in producing the same results
+<strong>if</strong> we can actually manage to run the same software on it. This is not
+something that can always be taken for granted, but it is a reliable assumption
+for the kind of analysis I am doing.</p>
+</div>
 </div>
 </div>
 </div>
@@ -440,7 +593,38 @@ through a population.</p>
 <h2 id="_analysis_pipeline">Analysis Pipeline</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>To see the pipeline that supports this analysis, look <a href="map/index.html">here</a>.</p>
+<p>It is possible to just write a single program or script to run the entire
+analysis at one time. Though this is workable, many anlayses, this one included,
+produce lots of intermediate outputs, and can take a while to run. It would be
+nice not to have to re-run parts of the anlaysis unless we have to. On the other
+hand, it would go against the principle of reproducibility to have a human just
+run parts of the analysis because that re-introduces the possibility that they
+will take a wrong step and get a non-reproducible result.</p>
+</div>
+<div class="paragraph">
+<p>Luckily, <code>make</code> is designed to solve exactly this problem and it is available on
+almost all systems. A <code>Makefile</code> can be written to describe the recipe for
+creating each intermediate output of the analysis, and to describe all of the
+dependencies that afftect them. This can be used to describe the entire analysis
+workflow, as in the following image.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="pipeline.png" alt="Analysis pipeline">
+</div>
+<div class="title">Figure 1. The analysis pipeline for this project.</div>
+</div>
+<div class="paragraph">
+<p>Make compares time stamps of all the files and automatically determines which
+steps of the anlaysis have to be re-run and which can be skipped. In addition to
+speeding up re-analysis when a file is changed, the Makfile is a very useful
+reference to help understand how each file in the repository contributes to the
+anlaysis.</p>
+</div>
+<div class="paragraph">
+<p>The pipeline dependency graph above itself is generated from the <code>Makefile</code> in
+this project as part of the analysis. This is done automatically using the
+python program <code>makefile2dot</code> and Graphviz.</p>
 </div>
 </div>
 </div>
@@ -476,20 +660,20 @@ S + I + R = N \\\]
 <div class="content">
 <img src="case1.png" alt="Case 1">
 </div>
-<div class="title">Figure 1. Case 1 - \beta = 0.04 and \gamma = 0.01</div>
+<div class="title">Figure 2. Case 1 - \(\beta = 0.04\) and \(\gamma = 0.01\)</div>
 </div>
 <div class="imageblock">
 <div class="content">
 <img src="case2.png" alt="Case 2">
 </div>
-<div class="title">Figure 2. Case 2 - \beta = 0.08 and \gamma = 0.04</div>
+<div class="title">Figure 3. Case 2 - \(\beta = 0.08\) and \(\gamma = 0.04\)</div>
 </div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-10 21:51:09 UTC
+Last updated 2020-04-11 21:59:19 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
