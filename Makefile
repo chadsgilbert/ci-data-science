@@ -6,7 +6,7 @@ all: site
 setup:
 	pip install -r requirements.txt
 	sudo apt-get update && sudo apt-get install -y asciidoctor graphviz
-	mkdir -p site/map
+	mkdir -p site
 
 .PHONY: lint
 lint: sir/sir
@@ -27,20 +27,17 @@ site/case1.png: sir/case1.h5
 site/case2.png: sir/case2.h5
 	sir/sir plot sir/case2.h5 $@
 
-site/index.html: index.adoc 
+site/index.html: index.adoc pipeline.adoc sir.adoc
 	asciidoctor index.adoc -o $@
 
-site/map/pipeline.png: Makefile
+site/pipeline.png: Makefile
 	makefile2dot <Makefile | dot -Tpng > $@
-
-site/map/index.html: map/index.adoc
-	asciidoctor map/index.adoc -o $@
 
 site: site/index.html \
 	site/case1.png \
 	site/case2.png \
-	site/map/index.html \
-	site/map/pipeline.png
+	site/index.html \
+	site/pipeline.png
 
 .PHONY: clean
 clean:

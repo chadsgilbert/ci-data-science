@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 pytest-env/
 *.h5
+*.png
 
 # C extensions
 *.so

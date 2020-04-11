@@ -1,6 +1,0 @@
-= Site Map
-
-This is the set of dependencies for this project.
-
-.The analysis pipeline for this project.
-image::pipeline.png[Analysis pipeline]
