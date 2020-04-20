@@ -13,6 +13,82 @@ import matplotlib.pyplot as plt
 import h5py
 
 
+def _analyse(name, output_file, beta_list, gamma_list):
+    """
+    Write statistics on infections from batch simulations to asciidoc table.
+    """
+    percent_infected = numpy.zeros((len(beta_list), len(gamma_list)))
+    for i in range(len(beta_list)):
+        for j in range(len(gamma_list)):
+            filename = f"{name}_{beta_list[i]}_{gamma_list[j]}.h5"
+            file = h5py.File(filename, 'r')
+            percent_infected[i, j] = max(file['data/infected'])
+
+    fig, axis = plt.subplots()
+    fig.set_size_inches(6, 6)
+    extent = [gamma_list[0] - 5, gamma_list[-1] + 5,
+              beta_list[0] - 5, beta_list[-1] + 5]
+    axis.imshow(percent_infected, extent=extent, origin='lower')
+    axis.set_xticks(gamma_list)
+    axis.set_yticks(beta_list)
+    plt.xlabel(r'$\gamma$')
+    plt.ylabel(r'$\beta$')
+    fig.tight_layout()
+
+    for i in range(len(beta_list)):
+        for j in range(len(gamma_list)):
+            axis.text(gamma_list[j], beta_list[i],
+                      "%.02f" % percent_infected[i, j],
+                      ha="center", va="center", color="k")
+
+    plt.savefig("graph.png")
+    if not output_file:
+        plt.show()
+    else:
+        plt.savefig(output_file)
+
+
+def analyse():
+    """
+    Table sub-command.
+    """
+    parser = argparse.ArgumentParser(description="Run the table generator.")
+    parser.add_argument('filename')
+    parser.add_argument('output_filename', nargs='?', default='')
+    parser.add_argument('--beta',
+                        default=range(10, 100, 10), type=list)
+    parser.add_argument('--gamma',
+                        default=range(10, 100, 10), type=list)
+    args = parser.parse_args(argv[2:])
+    _analyse(args.filename, args.output_filename, args.beta, args.gamma)
+
+
+def _batch(name, beta_list, gamma_list):
+    """
+    Run batch simulations for all combinations of beta_list and gamma_list.
+    """
+    for beta in beta_list:
+        for gamma in gamma_list:
+            beta_int = int(round(beta * 100))
+            gamma_int = int(round(gamma * 100))
+            _simulate(f'{name}_{beta_int}_{gamma_int}.h5',
+                      beta=beta, gamma=gamma)
+
+
+def batch():
+    """
+    Batch sub-command.
+    """
+    parser = argparse.ArgumentParser(description="Run the batch simulations")
+    parser.add_argument('filename')
+    parser.add_argument('--beta',
+                        default=numpy.arange(0.1, 1.0, 0.1), type=list)
+    parser.add_argument('--gamma',
+                        default=numpy.arange(0.1, 1.0, 0.1), type=list)
+    args = parser.parse_args(argv[2:])
+    _batch(args.filename, args.beta, args.gamma)
+
+
 def _simulate(output_filename, **kwargs):
     """
     Run a SIR simulation.
@@ -23,16 +99,16 @@ def _simulate(output_filename, **kwargs):
     N = S + I + R
     B = kwargs.get('beta', 0.04)
     g = kwargs.get('gamma', 0.01)
+    T = 0
     dt = 1.0
 
-    tt = []
-    ss = []
-    ii = []
-    rr = []
+    tt = [T]
+    ss = [S]
+    ii = [I]
+    rr = [R]
 
     it = 0
-    T = 0
-    for it in range(0, 600):
+    for it in range(0, 365):
         # Compute the rates.
         dS = -B * I * S / N
         dI = B * I * S / N - g * I
@@ -52,10 +128,16 @@ def _simulate(output_filename, **kwargs):
 
     with h5py.File(output_filename, 'w') as output_file:
         data = output_file.create_group(u"data")
-        data.create_dataset(u"time", data=numpy.array(tt))
-        data.create_dataset(u'susceptible', data=numpy.array(ss))
-        data.create_dataset(u'infected', data=numpy.array(ii))
-        data.create_dataset(u'recovered', data=numpy.array(rr))
+        data.attrs[u"beta"] = B
+        data.attrs[u"gamma"] = g
+        time = data.create_dataset(u"time", data=numpy.array(tt))
+        time.attrs[u"units"] = u'days'
+        susc = data.create_dataset(u'susceptible', data=numpy.array(ss))
+        susc.attrs[u"units"] = u'percent'
+        ifcd = data.create_dataset(u'infected', data=numpy.array(ii))
+        ifcd.attrs[u"units"] = u'percent'
+        rcvd = data.create_dataset(u'recovered', data=numpy.array(rr))
+        rcvd.attrs[u"units"] = u'percent'
         output_file.flush()
 
 
@@ -68,7 +150,6 @@ def simulate():
     parser.add_argument('--beta', default=0.04, type=float)
     parser.add_argument('--gamma', default=0.01, type=float)
     args = parser.parse_args(argv[2:])
-    print(args)
     _simulate(args.filename, beta=args.beta, gamma=args.gamma)
 
 
@@ -92,7 +173,10 @@ def _plot(input_filename, output_filename):
     plt.legend(['Susceptible', 'Infected', 'Recovered'])
     plt.ylabel('Percent of Population [%]')
     plt.xlabel('Time [days]')
-    plt.savefig(output_filename)
+    if not output_filename:
+        plt.show()
+    else:
+        plt.savefig(output_filename)
 
 
 def plot():
@@ -101,7 +185,7 @@ def plot():
     """
     plot_parser = argparse.ArgumentParser(description="Plot")
     plot_parser.add_argument('input')
-    plot_parser.add_argument('output')
+    plot_parser.add_argument('output', nargs='?', default='')
     plot_args = plot_parser.parse_args(argv[2:])
     _plot(plot_args.input, plot_args.output)
 
@@ -115,7 +199,9 @@ def main():
 
 The commands are:
   simulate  Run a simulation
-  plot      Plot simulation results''')
+  plot      Plot simulation results
+  batch     Run a batch of simulations
+  analyse   Make a table from batch of infected people''')
     parser.add_argument('command', help="The command to run")
     args = parser.parse_args(argv[1:2])
     globals()[args.command]()

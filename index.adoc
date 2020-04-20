@@ -1,6 +1,7 @@
 = The Pandemic Simulation
 Chad Gilbert
-:stem: latexmath
+:stem:
+:eqnums:
 :toc:
 
 Here I walk though some simple studies in epidemiological dynamics by
