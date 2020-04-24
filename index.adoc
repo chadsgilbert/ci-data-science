@@ -12,10 +12,11 @@ through a population.
 
 == Goals
 
-Although I am interested in understanding epidemiology, the true goal of this
-project is to practice and demonstrate a particular methodology for writing
-analytical reports. The challenge with currently popular workflows for
-conducting and reporting on technical anlayses is that it is very easy to lose
+Although have an amateur interest in understanding epidemiology, the true goal
+of this project is to practice and demonstrate a particular methodology for
+writing analytical reports based on computer simulation. The challenge with
+currently popular workflows for conducting and reporting on technical anlayses
+is that it is very easy to lose
 track of the process that was used to produce the analysis or report, to lose
 the ability to reproduce it, and to make mistakes that can never be recovered,
 checked, or revisited. Microsoft's Office desktop productivity suite is the
@@ -32,7 +33,7 @@ link:https://www.practicereproducibleresearch.org/[The Practice of Reproducible
 Research]. Although these books frame the problem in a way that is not exactly
 aligned with my own interests, they both highlight many of the same challenges
 that I am concerned with, and provide excellent guidance on solving some of the
-issues.
+issues. I owe several of the lessons used here to those books.
 
 == General Approach
 
@@ -42,7 +43,7 @@ automate it. So the general idea is very simple: we need to automate the
 simulations, automate post-processing of the simulations to produce figures and
 tables, and automate production of the document.
 
-Even with the process is automated, there are a lot of variables that can thwart
+Even with the process automated, there are a lot of variables that can thwart
 attempts to reproduce an analysis. The result can change or the software can
 just plain fail unless the same versions of the data, content, software,
 operating system and sometimes even hardware are different. There are two
@@ -62,16 +63,20 @@ on a web server with a known URI can be appropriate. Storage on a file system
 is less trustworthy, because it is hard to ensure that the data are never
 changed.
 
-One way to support assurance that datasets is to store a checksum of the data
-along side, and to store the checksum somewhere in the project. Then, when
+One way to support assurance that a dataset is identical to the one previously
+used is to store a checksum of the dataset
+along side, and to store the checksum somewhere in the project, perhaps even
+reporting it in the document. Then, when
 reproducing the analysis, it is easy to verify a matching checksum.
 
 The models in this repository are all simple and not trained from any real-world
-data, so this project does not demonstrate an approach to managing data.
+data, so this project does not demonstrate an approach to managing
+irreproducible data that might come from tests, trials or experiments conducted
+live in the real world on real systems.
 
 === Content
 
-The content of the project is anything and everything that is a part of the
+The content is anything and everything that is a part of the analysis for the
 project. This is likely to include program source code and the text of the
 report. The most popular tool for versioning this kind of content is `git`.
 
@@ -85,10 +90,22 @@ premises, or even across an "air gap", with no internet connectivity of any
 kind. Using git to track such work is particularly useful, because it is capable
 of reconstructing and reconciling changes, even across an air gap.
 
+Although git can track any kind of content, I believe that reproducibility is
+best achieved when only plain text content that was typed by a human be tracked.
+With plain text, there is no question as to how it was produced. The author sat
+at a text editor or terminal and entered the content. This is in contrast to
+content that may have been made by a GUI. Whether the resulting file is binary
+or "human-readable" text such as a xml file, it is very difficult to infer
+whether the author's intent is truly consistent with the product that arrives
+on disk. In the name of pragmatism, I don't believe this principle should always
+be kept as a strict rule; but I believe it is a gold standard to strive to. This
+example repository will consist only of plan text typed by the author.
+
 To support sharing of the content, plus integration with useful tools like
 Continuous Integration and Continuous Deployment pipelines a service such as
 GitHub or GitLab can be used. This project uses GitHub with GitHub Actions, and
-serves the site on GitHub Pages.
+serves the site on GitHub Pages. This page is build from the GitHub repository
+https://github.com/chadsgilbert/ci-data-science[here].
 
 === Software
 

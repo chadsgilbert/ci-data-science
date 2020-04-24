@@ -33,12 +33,11 @@ site/case1.png: sir/case1.h5
 site/case2.png: sir/case2.h5
 	sir/sir plot sir/case2.h5 $@
 
-results = $(shell printf "sir/batch_%s.h5 " {10..90..10}"_"{10..90..10})
-$(info $(results))
-$(results) &: sir/sir 
+sir_results = $(shell printf "sir/batch_%s.h5 " {10..90..10}"_"{10..90..10})
+$(sir_results) &: sir/sir
 	sir/sir batch sir/batch
 
-site/beta_v_gamma.png: $(results)
+site/beta_v_gamma.png: $(sir_results)
 	sir/sir analyse sir/batch site/beta_v_gamma.png
 
 site/index.html: index.adoc pipeline.adoc sir.adoc

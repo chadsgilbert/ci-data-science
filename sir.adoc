@@ -3,16 +3,19 @@ The first model idealizes a disease like measles, mumps or rubella, in which
 people who have recovered from it maintain immunity for the rest of their
 life.
 
-Let stem:[S] be a real number representing the proportion of the population
+Let stem:[S] be a real number in the range stem:[\[0,1\]] representing the
+proportion of the population
 that is susceptible to the disease. They are healthy and have no immunity
 against the disease. In this model, we will assume that all people in the
 population are equally likely to get the disease and none of them are immune to
 it.
 
-Let stem:[I] be a real number representing the propotion of the population
+Let stem:[I] be a real number in the range stem:[\[0, 1\]] representing the
+propotion of the population
 that is currently infected with the disease.
 
-Let stem:[R] be a real number representing the  proportion of the population
+Let stem:[R] be a real number in the range stem:[\[0, 1\]] representing the
+proportion of the population
 that has recovered from the disease. These people are no lnger contagious,
 meaning they can no longer get anyone else sick, and they are immune to the
 disease, so they can't get it again.
@@ -23,12 +26,12 @@ equations:
 
 [latexmath]
 ++++
-\frac{dS}{dt} = -\frac{\beta I S}{N} \\
-\frac{dI}{dt} = \frac{\beta I S}{N} - \gamma I \\
+\frac{dS}{dt} = -\beta I S \\
+\frac{dI}{dt} = \beta I S - \gamma I \\
 \frac{dR}{dt} = \gamma I
 ++++
 
-where stem:[N] is the total population (stem:[N = S + I + R]).
+where stem:[S + I + R = 1].
 
 In this analysis, we will start by assuming that stem:[\beta] and stem:[\gamma]
 are constant. Note that stem:[\beta] and stem:[\gamma] have dimension of inverse
@@ -86,6 +89,44 @@ stem:[80 \%] of the population will have been infected at some point.
 [title=' - stem:[\beta = 0.08] and stem:[\gamma = 0.04]']
 image::case2.png[caption='{figure-caption} {counter:refnum}']
 
+At this point it should be pretty clear, both from mathematical analysis of the
+equations, and from a superficial analysis of the individual simulations in
+cases 0 through 2, that the stem:[\beta] and stem:[\gamma] control:
+
+  1. the portion of the population that becomes sick simultaneously; and
+  2. the portion of the population the gets sick eventually;
+  3. the duration of the pandemic.
+
+The the sections that follow, we compare the effects of different stem:[\beta]
+and stem:[\gamma] on these key measures.
+
+=== The Flatness of the Curve
+
+During news coverage on COVID-19, there has been lots of talk about "flattening
+the curve". Remembering that the only purpose of this document is to use a very
+simplistic model as a toy to demonstrate how to create reproducible simulations
+and analyses, not as an attempt to make any recommendations about or even
+provide insight into the present pandemic, it is nonetheless clear why we should
+want to look at the portion of the population who become infected at the same
+time. Too many simultaneous infections puts an excessive load on the systems
+that care for the infected people who fall ill.
+
+Simulations were run for every combination of stem:[\beta] in stem:[{0.01, 0.02,
+0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09}] and stem:[\gamma] in stem:[{0.01,
+0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08. 0.09]. For each combination, the
+maximum value of stem:[I] is reported in <<sir_max_simultaneous_infections,
+{figure-caption} {counter:refnum}>>.
+
 [#sir_max_simultaneous_infections]
-[title=' - the maximum number of simultaneous infections for combinations of stem:[\beta] and stem:[\gamma].']
+[title=' - the maximum percentage of simultaneous infections for combinations of stem:[\beta] and stem:[\gamma].']
 image::beta_v_gamma.png[caption='{figure-caption} {counter:refnum}', align="center"]
+
+For all cases when stem:[\gamma] is less than stem:[\beta], the maximum value is
+stem:[0.01], or 1%. This is because the portion of infections was started at
+stem:[I = 0], and immediately began to decrease. The approximate trend is that
+as the ratio stem:[\beta / \gamma] increases, so does the number of
+simultaneous infections. Interestingly, different stem:[\beta] and stem:[\gamma]
+still have similar values for the peak. For example, for stem:[\beta = 0.02] and
+stem:[\gamma = 0.01], the peak is 16%, and for stem:[\beta = 0.04] and
+stem:[\gamma = 0.02], the peaks is also 16%.
+
