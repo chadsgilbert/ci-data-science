@@ -130,3 +130,9 @@ still have similar values for the peak. For example, for stem:[\beta = 0.02] and
 stem:[\gamma = 0.01], the peak is 16%, and for stem:[\beta = 0.04] and
 stem:[\gamma = 0.02], the peaks is also 16%.
 
+[#sir_max_total_infections]
+[title=' - the maximum percentage of total infections for combinations of stem:[\beta] and stem:[\gamma].']
+image::beta_v_gamma_total.png[caption='{figure-caption} {counter:refnum}', align="center"]
+
+
+

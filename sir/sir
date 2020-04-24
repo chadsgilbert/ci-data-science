@@ -13,16 +13,16 @@ import matplotlib.pyplot as plt
 import h5py
 
 
-def _analyse(name, output_file, beta_list, gamma_list):
+def _read_from_files(name, output_file, beta_list, gamma_list, function):
     """
-    Write statistics on infections from batch simulations to asciidoc table.
+    Read something from files.
     """
     percent_infected = numpy.zeros((len(beta_list), len(gamma_list)))
     for i in range(len(beta_list)):
         for j in range(len(gamma_list)):
             filename = f"{name}_{beta_list[i]}_{gamma_list[j]}.h5"
             file = h5py.File(filename, 'r')
-            percent_infected[i, j] = max(file['data/infected'])
+            percent_infected[i, j] = function(file)
 
     fig, axis = plt.subplots()
     fig.set_size_inches(6, 6)
@@ -48,9 +48,43 @@ def _analyse(name, output_file, beta_list, gamma_list):
         plt.savefig(output_file)
 
 
+def _total(filename, output_filename, beta_list, gamma_list):
+    """
+    Total number of infections.
+    """
+    def get_max(file):
+        return file['data/recovered'][-1]
+
+    _read_from_files(filename, output_filename, beta_list, gamma_list, get_max)
+
+
+def total():
+    """
+    Total sub-command.
+    """
+    parser = argparse.ArgumentParser(
+        description="Get the total number of infections.")
+    parser.add_argument('filename')
+    parser.add_argument('output_filename')
+    parser.add_argument('--beta', default=range(10, 100, 10), type=list)
+    parser.add_argument('--gamma', default=range(10, 100, 10), type=list)
+    args = parser.parse_args(argv[2:])
+    _total(args.filename, args.output_filename, args.beta, args.gamma)
+
+
+def _analyse(name, output_file, beta_list, gamma_list):
+    """
+    Write statistics on infections from batch simulations to asciidoc table.
+    """
+    def get_max(file):
+        return max(file['data/infected'])
+
+    _read_from_files(name, output_file, beta_list, gamma_list, get_max)
+
+
 def analyse():
     """
-    Table sub-command.
+    Analyse sub-command.
     """
     parser = argparse.ArgumentParser(description="Run the table generator.")
     parser.add_argument('filename')

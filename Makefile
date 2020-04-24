@@ -40,6 +40,9 @@ $(sir_results) &: sir/sir
 site/beta_v_gamma.png: $(sir_results)
 	sir/sir analyse sir/batch site/beta_v_gamma.png
 
+site/beta_v_gamma_total.png: $(sir_results)
+	sir/sir total sir/batch site/beta_v_gamma_total.png 
+
 site/index.html: index.adoc pipeline.adoc sir.adoc
 	asciidoctor index.adoc -o $@
 
@@ -51,6 +54,7 @@ site: site/index.html \
 	site/case1.png \
 	site/case2.png \
 	site/beta_v_gamma.png \
+	site/beta_v_gamma_total.png \
 	site/index.html \
 	site/pipeline.png
 
