@@ -442,6 +442,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <li><a href="#_the_susceptible_infected_recovered_sir_model">The Susceptible, Infected, Recovered (SIR) Model</a>
 <ul class="sectlevel2">
 <li><a href="#_basic_dynamics">Basic Dynamics</a></li>
+<li><a href="#_the_flatness_of_the_curve">The Flatness of the Curve</a></li>
 </ul>
 </li>
 </ul>
@@ -463,10 +464,11 @@ through a population.</p>
 <h2 id="_goals">Goals</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>Although I am interested in understanding epidemiology, the true goal of this
-project is to practice and demonstrate a particular methodology for writing
-analytical reports. The challenge with currently popular workflows for
-conducting and reporting on technical anlayses is that it is very easy to lose
+<p>Although have an amateur interest in understanding epidemiology, the true goal
+of this project is to practice and demonstrate a particular methodology for
+writing analytical reports based on computer simulation. The challenge with
+currently popular workflows for conducting and reporting on technical anlayses
+is that it is very easy to lose
 track of the process that was used to produce the analysis or report, to lose
 the ability to reproduce it, and to make mistakes that can never be recovered,
 checked, or revisited. Microsoft&#8217;s Office desktop productivity suite is the
@@ -484,7 +486,7 @@ on the topic that are openly available are
 Research</a>. Although these books frame the problem in a way that is not exactly
 aligned with my own interests, they both highlight many of the same challenges
 that I am concerned with, and provide excellent guidance on solving some of the
-issues.</p>
+issues. I owe several of the lessons used here to those books.</p>
 </div>
 </div>
 </div>
@@ -499,7 +501,7 @@ simulations, automate post-processing of the simulations to produce figures and
 tables, and automate production of the document.</p>
 </div>
 <div class="paragraph">
-<p>Even with the process is automated, there are a lot of variables that can thwart
+<p>Even with the process automated, there are a lot of variables that can thwart
 attempts to reproduce an analysis. The result can change or the software can
 just plain fail unless the same versions of the data, content, software,
 operating system and sometimes even hardware are different. There are two
@@ -521,19 +523,23 @@ is less trustworthy, because it is hard to ensure that the data are never
 changed.</p>
 </div>
 <div class="paragraph">
-<p>One way to support assurance that datasets is to store a checksum of the data
-along side, and to store the checksum somewhere in the project. Then, when
+<p>One way to support assurance that a dataset is identical to the one previously
+used is to store a checksum of the dataset
+along side, and to store the checksum somewhere in the project, perhaps even
+reporting it in the document. Then, when
 reproducing the analysis, it is easy to verify a matching checksum.</p>
 </div>
 <div class="paragraph">
 <p>The models in this repository are all simple and not trained from any real-world
-data, so this project does not demonstrate an approach to managing data.</p>
+data, so this project does not demonstrate an approach to managing
+irreproducible data that might come from tests, trials or experiments conducted
+live in the real world on real systems.</p>
 </div>
 </div>
 <div class="sect2">
 <h3 id="_content">Content</h3>
 <div class="paragraph">
-<p>The content of the project is anything and everything that is a part of the
+<p>The content is anything and everything that is a part of the analysis for the
 project. This is likely to include program source code and the text of the
 report. The most popular tool for versioning this kind of content is <code>git</code>.</p>
 </div>
@@ -549,10 +555,23 @@ kind. Using git to track such work is particularly useful, because it is capable
 of reconstructing and reconciling changes, even across an air gap.</p>
 </div>
 <div class="paragraph">
+<p>Although git can track any kind of content, I believe that reproducibility is
+best achieved when only plain text content that was typed by a human be tracked.
+With plain text, there is no question as to how it was produced. The author sat
+at a text editor or terminal and entered the content. This is in contrast to
+content that may have been made by a GUI. Whether the resulting file is binary
+or "human-readable" text such as a xml file, it is very difficult to infer
+whether the author&#8217;s intent is truly consistent with the product that arrives
+on disk. In the name of pragmatism, I don&#8217;t believe this principle should always
+be kept as a strict rule; but I believe it is a gold standard to strive to. This
+example repository will consist only of plan text typed by the author.</p>
+</div>
+<div class="paragraph">
 <p>To support sharing of the content, plus integration with useful tools like
 Continuous Integration and Continuous Deployment pipelines a service such as
 GitHub or GitLab can be used. This project uses GitHub with GitHub Actions, and
-serves the site on GitHub Pages.</p>
+serves the site on GitHub Pages. This page is build from the GitHub repository
+<a href="https://github.com/chadsgilbert/ci-data-science">here</a>.</p>
 </div>
 </div>
 <div class="sect2">
@@ -641,18 +660,21 @@ people who have recovered from it maintain immunity for the rest of their
 life.</p>
 </div>
 <div class="paragraph">
-<p>Let \$S\$ be a real number representing the proportion of the population
+<p>Let \$S\$ be a real number in the range \$\[0,1]\$ representing the
+proportion of the population
 that is susceptible to the disease. They are healthy and have no immunity
 against the disease. In this model, we will assume that all people in the
 population are equally likely to get the disease and none of them are immune to
 it.</p>
 </div>
 <div class="paragraph">
-<p>Let \$I\$ be a real number representing the propotion of the population
+<p>Let \$I\$ be a real number in the range \$\[0, 1]\$ representing the
+propotion of the population
 that is currently infected with the disease.</p>
 </div>
 <div class="paragraph">
-<p>Let \$R\$ be a real number representing the  proportion of the population
+<p>Let \$R\$ be a real number in the range \$\[0, 1]\$ representing the
+proportion of the population
 that has recovered from the disease. These people are no lnger contagious,
 meaning they can no longer get anyone else sick, and they are immune to the
 disease, so they can&#8217;t get it again.</p>
@@ -664,13 +686,13 @@ equations:</p>
 </div>
 <div class="stemblock">
 <div class="content">
-\[\frac{dS}{dt} = -\frac{\beta I S}{N} \\
-\frac{dI}{dt} = \frac{\beta I S}{N} - \gamma I \\
+\[\frac{dS}{dt} = -\beta I S \\
+\frac{dI}{dt} = \beta I S - \gamma I \\
 \frac{dR}{dt} = \gamma I\]
 </div>
 </div>
 <div class="paragraph">
-<p>where \$N\$ is the total population (\$N = S + I + R\$).</p>
+<p>where \$S + I + R = 1\$.</p>
 </div>
 <div class="paragraph">
 <p>In this analysis, we will start by assuming that \$\beta\$ and \$\gamma\$
@@ -741,11 +763,68 @@ simultaneously infected people peaks earlier after about 100 days, with
 </div>
 <div class="title">Figure 3 - \$\beta = 0.08\$ and \$\gamma = 0.04\$</div>
 </div>
+<div class="paragraph">
+<p>At this point it should be pretty clear, both from mathematical analysis of the
+equations, and from a superficial analysis of the individual simulations in
+cases 0 through 2, that the \$\beta\$ and \$\gamma\$ control:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>the portion of the population that becomes sick simultaneously; and</p>
+</li>
+<li>
+<p>the portion of the population the gets sick eventually;</p>
+</li>
+<li>
+<p>the duration of the pandemic.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The the sections that follow, we compare the effects of different \$\beta\$
+and \$\gamma\$ on these key measures.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_the_flatness_of_the_curve">The Flatness of the Curve</h3>
+<div class="paragraph">
+<p>During news coverage on COVID-19, there has been lots of talk about "flattening
+the curve". Remembering that the only purpose of this document is to use a very
+simplistic model as a toy to demonstrate how to create reproducible simulations
+and analyses, not as an attempt to make any recommendations about or even
+provide insight into the present pandemic, it is nonetheless clear why we should
+want to look at the portion of the population who become infected at the same
+time. Too many simultaneous infections puts an excessive load on the systems
+that care for the infected people who fall ill.</p>
+</div>
+<div class="paragraph">
+<p>Simulations were run for every combination of \$\beta\$ in \${0.01, 0.02,
+0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09}\$ and \$\gamma\$ in \${0.01,
+0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08. 0.09\$. For each combination, the
+maximum value of \$I\$ is reported in <a href="#sir_max_simultaneous_infections">Figure 4</a>.</p>
+</div>
 <div id="sir_max_simultaneous_infections" class="imageblock" style="text-align: center">
 <div class="content">
 <img src="beta_v_gamma.png" alt="beta v gamma">
 </div>
-<div class="title">Figure 4 - the maximum number of simultaneous infections for combinations of \$\beta\$ and \$\gamma\$.</div>
+<div class="title">Figure 4 - the maximum percentage of simultaneous infections for combinations of \$\beta\$ and \$\gamma\$.</div>
+</div>
+<div class="paragraph">
+<p>For all cases when \$\gamma\$ is less than \$\beta\$, the maximum value is
+\$0.01\$, or 1%. This is because the portion of infections was started at
+\$I = 0\$, and immediately began to decrease. The approximate trend is that
+as the ratio \$\beta / \gamma\$ increases, so does the number of
+simultaneous infections. Interestingly, different \$\beta\$ and \$\gamma\$
+still have similar values for the peak. For example, for \$\beta = 0.02\$ and
+\$\gamma = 0.01\$, the peak is 16%, and for \$\beta = 0.04\$ and
+\$\gamma = 0.02\$, the peaks is also 16%.</p>
+</div>
+<div id="sir_max_total_infections" class="imageblock" style="text-align: center">
+<div class="content">
+<img src="beta_v_gamma_total.png" alt="beta v gamma total">
+</div>
+<div class="title">Figure 5 - the maximum percentage of total infections for combinations of \$\beta\$ and \$\gamma\$.</div>
 </div>
 </div>
 </div>
@@ -753,7 +832,7 @@ simultaneously infected people peaks earlier after about 100 days, with
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-20 01:02:58 UTC
+Last updated 2020-04-24 01:45:47 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
