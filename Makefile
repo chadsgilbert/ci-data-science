@@ -12,7 +12,7 @@ setup:
 lint: .linted
 
 .linted: sir/sir sir/plot sir/duration sir/total sir/analyse
-	pycodestyle $? --ignore=E741 && touch .linted
+	pycodestyle $? && touch .linted
 
 .PHONY: check
 check: .checked
@@ -40,18 +40,17 @@ site/case1.png: sir/plot sir/case1.h5
 site/case2.png: sir/plot sir/case2.h5
 	sir/plot sir/case2.h5 $@
 
-sir_results := $(shell printf "sir/batch_%s.h5 " {10..90..10}"_"{10..90..10})
-$(sir_results) &: sir/sir
-	sir/sir batch sir/batch
+sir/batch.h5: sir/sir
+	sir/sir batch sir/batch.h5
 
-site/beta_v_gamma.png: sir/analyse $(sir_results)
-	sir/analyse sir/batch site/beta_v_gamma.png
+site/beta_v_gamma.png: sir/analyse sir/batch.h5
+	sir/analyse sir/batch.h5 site/beta_v_gamma.png
 
-site/beta_v_gamma_total.png: sir/total $(sir_results)
-	sir/total sir/batch site/beta_v_gamma_total.png 
+site/beta_v_gamma_total.png: sir/total sir/batch.h5
+	sir/total sir/batch.h5 site/beta_v_gamma_total.png 
 
-site/beta_v_gamma_duration.png: sir/duration $(sir_results)
-	sir/duration sir/batch site/beta_v_gamma_duration.png
+site/beta_v_gamma_duration.png: sir/duration sir/batch.h5
+	sir/duration sir/batch.h5 site/beta_v_gamma_duration.png
 
 site/index.html: index.adoc pipeline.adoc sir.adoc
 	asciidoctor index.adoc -o $@

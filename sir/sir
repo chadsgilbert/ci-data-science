@@ -14,7 +14,7 @@ import h5py
 from read_from_file import read_from_files
 
 
-def _batch(name, beta_list, gamma_list):
+def _batch(output_file, beta_list, gamma_list):
     """
     Run batch simulations for all combinations of beta_list and gamma_list.
     """
@@ -22,8 +22,10 @@ def _batch(name, beta_list, gamma_list):
         for gamma in gamma_list:
             beta_int = int(round(beta * 100))
             gamma_int = int(round(gamma * 100))
-            _simulate(f'{name}_{beta_int}_{gamma_int}.h5',
-                      beta=beta, gamma=gamma)
+            data = output_file.create_group(f"b{beta_int}_g{gamma_int}")
+            data.attrs[u"beta"] = beta
+            data.attrs[u"gamma"] = gamma
+            _simulate(data, beta=beta, gamma=gamma)
 
 
 def batch():
@@ -32,64 +34,57 @@ def batch():
     """
     parser = argparse.ArgumentParser(description="Run the batch simulations")
     parser.add_argument('filename')
-    parser.add_argument('--beta',
-                        default=numpy.arange(0.1, 1.0, 0.1), type=list)
-    parser.add_argument('--gamma',
-                        default=numpy.arange(0.1, 1.0, 0.1), type=list)
+    default = numpy.arange(0.1, 1.0, 0.1)
+    parser.add_argument('--beta', default=default, type=list)
+    parser.add_argument('--gamma', default=default, type=list)
     args = parser.parse_args(argv[2:])
-    _batch(args.filename, args.beta, args.gamma)
+    with h5py.File(args.filename, 'w') as output_file:
+        _batch(output_file, args.beta, args.gamma)
 
 
-def _simulate(output_filename, **kwargs):
+def _simulate(data, beta, gamma):
     """
-    Run a SIR simulation.
+    Run a SIR simulation, storing the time-series data in data.
     """
-    S = 99.0
-    I = 1.0
-    R = 0.0
-    N = S + I + R
-    B = kwargs.get('beta', 0.04)
-    g = kwargs.get('gamma', 0.01)
-    T = 0
-    dt = 1.0
+    susceptible = 0.99
+    infected = 0.01
+    recovered = 0.0
 
-    tt = [T]
-    ss = [S]
-    ii = [I]
-    rr = [R]
+    duration = 365
+    current_time = 0
+    time_step = 1.0
 
-    it = 0
-    for it in range(0, 365):
+    time = data.create_dataset(u"time", (duration + 1,))
+    time.attrs[u"units"] = u'days'
+    susc = data.create_dataset(u'susceptible', (duration + 1,))
+    susc.attrs[u"units"] = u'percent'
+    ifcd = data.create_dataset(u'infected', (duration + 1,))
+    ifcd.attrs[u"units"] = u'percent'
+    rcvd = data.create_dataset(u'recovered', (duration + 1,))
+    rcvd.attrs[u"units"] = u'percent'
+
+    time[0] = current_time
+    susc[0] = susceptible
+    ifcd[0] = infected
+    rcvd[0] = recovered
+
+    for iterator in range(0, duration):
         # Compute the rates.
-        dS = -B * I * S / N
-        dI = B * I * S / N - g * I
-        dR = g * I
+        delta_susceptible = -beta * infected * susceptible
+        delta_infected = beta * infected * susceptible - gamma * infected
+        delta_recovered = gamma * infected
 
         # Compute the values at the next time.
-        T += dt
-        S += dt * dS
-        I += dt * dI
-        R += dt * dR
+        current_time += time_step
+        susceptible += time_step * delta_susceptible
+        infected += time_step * delta_infected
+        recovered += time_step * delta_recovered
 
         # Store the values for analysis.
-        tt.append(T)
-        ss.append(S)
-        ii.append(I)
-        rr.append(R)
-
-    with h5py.File(output_filename, 'w') as output_file:
-        data = output_file.create_group(u"data")
-        data.attrs[u"beta"] = B
-        data.attrs[u"gamma"] = g
-        time = data.create_dataset(u"time", data=numpy.array(tt))
-        time.attrs[u"units"] = u'days'
-        susc = data.create_dataset(u'susceptible', data=numpy.array(ss))
-        susc.attrs[u"units"] = u'percent'
-        ifcd = data.create_dataset(u'infected', data=numpy.array(ii))
-        ifcd.attrs[u"units"] = u'percent'
-        rcvd = data.create_dataset(u'recovered', data=numpy.array(rr))
-        rcvd.attrs[u"units"] = u'percent'
-        output_file.flush()
+        data['time'][iterator + 1] = current_time
+        susc[iterator + 1] = susceptible
+        ifcd[iterator + 1] = infected
+        rcvd[iterator + 1] = recovered
 
 
 def simulate():
@@ -101,7 +96,10 @@ def simulate():
     parser.add_argument('--beta', default=0.04, type=float)
     parser.add_argument('--gamma', default=0.01, type=float)
     args = parser.parse_args(argv[2:])
-    _simulate(args.filename, beta=args.beta, gamma=args.gamma)
+    with h5py.File(args.filename, 'w') as output_file:
+        data = output_file.create_group(u"data")
+        _simulate(data, args.beta, args.gamma)
+        output_file.flush()
 
 
 def main():

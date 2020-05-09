@@ -5,17 +5,18 @@ Analyse batch S-I-R simulation.
 """
 
 import argparse
-from read_from_file import read_from_files
+import h5py
+from read_from_file import dataset_map
 
 
-def _analyse(name, output_file, beta_list, gamma_list):
+def _analyse(h5file, output_file, beta_list, gamma_list):
     """
     Write statistics on infections from batch simulations to asciidoc table.
     """
-    def get_max(file):
-        return max(file['data/infected'])
+    def get_max(dataset):
+        return 100 * max(dataset['infected'])
 
-    read_from_files(name, output_file, beta_list, gamma_list, get_max)
+    dataset_map(h5file, output_file, beta_list, gamma_list, get_max)
 
 
 def analyse():
@@ -25,12 +26,12 @@ def analyse():
     parser = argparse.ArgumentParser(description="Run the table generator.")
     parser.add_argument('filename')
     parser.add_argument('output_filename', nargs='?', default='')
-    parser.add_argument('--beta',
-                        default=range(10, 100, 10), type=list)
-    parser.add_argument('--gamma',
-                        default=range(10, 100, 10), type=list)
+    default = range(10, 100, 10)
+    parser.add_argument('--beta', default=default, type=list)
+    parser.add_argument('--gamma', default=default, type=list)
     args = parser.parse_args()
-    _analyse(args.filename, args.output_filename, args.beta, args.gamma)
+    with h5py.File(args.filename, 'r') as h5file:
+        _analyse(h5file, args.output_filename, args.beta, args.gamma)
 
 
 if __name__ == "__main__":

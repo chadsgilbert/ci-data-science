@@ -4,16 +4,16 @@ import numpy
 import h5py
 
 
-def read_from_files(name, output_file, beta_list, gamma_list, function):
+def dataset_map(h5file, output_file, beta_list, gamma_list, function):
     """
-    Read something from files.
+    Apply an arbitrary function to datasets for all beta and gamma, and collect
+    them in a 2D heat-map.
     """
     percent_infected = numpy.zeros((len(beta_list), len(gamma_list)))
     for i in range(len(beta_list)):
         for j in range(len(gamma_list)):
-            filename = f"{name}_{beta_list[i]}_{gamma_list[j]}.h5"
-            file = h5py.File(filename, 'r')
-            percent_infected[i, j] = function(file)
+            dataset = h5file[f"b{beta_list[i]}_g{gamma_list[j]}"]
+            percent_infected[i, j] = function(dataset)
 
     fig, axis = plt.subplots()
     fig.set_size_inches(6, 6)
@@ -32,7 +32,6 @@ def read_from_files(name, output_file, beta_list, gamma_list, function):
                       "%.02f" % percent_infected[i, j],
                       ha="center", va="center", color="k")
 
-    plt.savefig("graph.png")
     if not output_file:
         plt.show()
     else:
