@@ -11,90 +11,7 @@ import argparse
 import numpy
 import matplotlib.pyplot as plt
 import h5py
-
-
-def _read_from_files(name, output_file, beta_list, gamma_list, function):
-    """
-    Read something from files.
-    """
-    percent_infected = numpy.zeros((len(beta_list), len(gamma_list)))
-    for i in range(len(beta_list)):
-        for j in range(len(gamma_list)):
-            filename = f"{name}_{beta_list[i]}_{gamma_list[j]}.h5"
-            file = h5py.File(filename, 'r')
-            percent_infected[i, j] = function(file)
-
-    fig, axis = plt.subplots()
-    fig.set_size_inches(6, 6)
-    extent = [gamma_list[0] - 5, gamma_list[-1] + 5,
-              beta_list[0] - 5, beta_list[-1] + 5]
-    axis.imshow(percent_infected, extent=extent, origin='lower')
-    axis.set_xticks(gamma_list)
-    axis.set_yticks(beta_list)
-    plt.xlabel(r'$\gamma$')
-    plt.ylabel(r'$\beta$')
-    fig.tight_layout()
-
-    for i in range(len(beta_list)):
-        for j in range(len(gamma_list)):
-            axis.text(gamma_list[j], beta_list[i],
-                      "%.02f" % percent_infected[i, j],
-                      ha="center", va="center", color="k")
-
-    plt.savefig("graph.png")
-    if not output_file:
-        plt.show()
-    else:
-        plt.savefig(output_file)
-
-
-def _total(filename, output_filename, beta_list, gamma_list):
-    """
-    Total number of infections.
-    """
-    def get_max(file):
-        return file['data/recovered'][-1]
-
-    _read_from_files(filename, output_filename, beta_list, gamma_list, get_max)
-
-
-def total():
-    """
-    Total sub-command.
-    """
-    parser = argparse.ArgumentParser(
-        description="Get the total number of infections.")
-    parser.add_argument('filename')
-    parser.add_argument('output_filename')
-    parser.add_argument('--beta', default=range(10, 100, 10), type=list)
-    parser.add_argument('--gamma', default=range(10, 100, 10), type=list)
-    args = parser.parse_args(argv[2:])
-    _total(args.filename, args.output_filename, args.beta, args.gamma)
-
-
-def _analyse(name, output_file, beta_list, gamma_list):
-    """
-    Write statistics on infections from batch simulations to asciidoc table.
-    """
-    def get_max(file):
-        return max(file['data/infected'])
-
-    _read_from_files(name, output_file, beta_list, gamma_list, get_max)
-
-
-def analyse():
-    """
-    Analyse sub-command.
-    """
-    parser = argparse.ArgumentParser(description="Run the table generator.")
-    parser.add_argument('filename')
-    parser.add_argument('output_filename', nargs='?', default='')
-    parser.add_argument('--beta',
-                        default=range(10, 100, 10), type=list)
-    parser.add_argument('--gamma',
-                        default=range(10, 100, 10), type=list)
-    args = parser.parse_args(argv[2:])
-    _analyse(args.filename, args.output_filename, args.beta, args.gamma)
+from read_from_file import read_from_files
 
 
 def _batch(name, beta_list, gamma_list):
@@ -187,43 +104,6 @@ def simulate():
     _simulate(args.filename, beta=args.beta, gamma=args.gamma)
 
 
-def _plot(input_filename, output_filename):
-    """
-    Plot the time-series in output_filename.
-    """
-    output_file = h5py.File(input_filename, 'r')
-
-    data = output_file.get('data')
-    time = data.get('time')[...]
-    susceptible = data.get('susceptible')
-    infected = data.get('infected')
-    recovered = data.get('recovered')
-
-    fig = plt.figure()
-    fig.set_size_inches(10, 5)
-    plt.plot(time, susceptible[...])
-    plt.plot(time, infected[...])
-    plt.plot(time, recovered[...])
-    plt.legend(['Susceptible', 'Infected', 'Recovered'])
-    plt.ylabel('Percent of Population [%]')
-    plt.xlabel('Time [days]')
-    if not output_filename:
-        plt.show()
-    else:
-        plt.savefig(output_filename)
-
-
-def plot():
-    """
-    Run the plot subcommand.
-    """
-    plot_parser = argparse.ArgumentParser(description="Plot")
-    plot_parser.add_argument('input')
-    plot_parser.add_argument('output', nargs='?', default='')
-    plot_args = plot_parser.parse_args(argv[2:])
-    _plot(plot_args.input, plot_args.output)
-
-
 def main():
     """
     Parse the input command to determine which ont to run.
@@ -233,9 +113,7 @@ def main():
 
 The commands are:
   simulate  Run a simulation
-  plot      Plot simulation results
-  batch     Run a batch of simulations
-  analyse   Make a table from batch of infected people''')
+  batch     Run a batch of simulations''')
     parser.add_argument('command', help="The command to run")
     args = parser.parse_args(argv[1:2])
     globals()[args.command]()
