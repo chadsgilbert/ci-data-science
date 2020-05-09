@@ -443,6 +443,8 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel2">
 <li><a href="#_basic_dynamics">Basic Dynamics</a></li>
 <li><a href="#_the_flatness_of_the_curve">The Flatness of the Curve</a></li>
+<li><a href="#_total_number_of_infections">Total Number of Infections</a></li>
+<li><a href="#_speed">Speed</a></li>
 </ul>
 </li>
 </ul>
@@ -801,7 +803,7 @@ that care for the infected people who fall ill.</p>
 <div class="paragraph">
 <p>Simulations were run for every combination of \$\beta\$ in \${0.01, 0.02,
 0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09}\$ and \$\gamma\$ in \${0.01,
-0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08. 0.09\$. For each combination, the
+0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08. 0.09}\$. For each combination, the
 maximum value of \$I\$ is reported in <a href="#sir_max_simultaneous_infections">Figure 4</a>.</p>
 </div>
 <div id="sir_max_simultaneous_infections" class="imageblock" style="text-align: center">
@@ -820,6 +822,20 @@ still have similar values for the peak. For example, for \$\beta = 0.02\$ and
 \$\gamma = 0.01\$, the peak is 16%, and for \$\beta = 0.04\$ and
 \$\gamma = 0.02\$, the peaks is also 16%.</p>
 </div>
+</div>
+<div class="sect2">
+<h3 id="_total_number_of_infections">Total Number of Infections</h3>
+<div class="paragraph">
+<p>There is also the question of how many people must become infected to achieve
+"herd immunity". Will everyone get sick? Or how many will be spared of the
+illness once enough have recovered and developed immunity?</p>
+</div>
+<div class="paragraph">
+<p>From the same simulations in the previous section, we can measure the total
+number of people having been infected. These are shown in
+<a href="#sir_max_total_infections">Figure 5</a>. Perhaps
+unsurprisingly, the relationship is similar.</p>
+</div>
 <div id="sir_max_total_infections" class="imageblock" style="text-align: center">
 <div class="content">
 <img src="beta_v_gamma_total.png" alt="beta v gamma total">
@@ -827,12 +843,21 @@ still have similar values for the peak. For example, for \$\beta = 0.02\$ and
 <div class="title">Figure 5 - the maximum percentage of total infections for combinations of \$\beta\$ and \$\gamma\$.</div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="_speed">Speed</h3>
+<div id="sir_duration" class="imageblock" style="text-align: center">
+<div class="content">
+<img src="beta_v_gamma_duration.png" alt="beta v gamma duration">
+</div>
+<div class="title">Figure 6 - the duration of the pandemic for combinations of \$\beta\$ and \$\gamma\$.</div>
+</div>
+</div>
 </div>
 </div>
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-04-24 01:45:47 UTC
+Last updated 2020-05-09 19:01:30 UTC
 </div>
 </div>
 <script type="text/x-mathjax-config">
