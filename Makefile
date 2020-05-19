@@ -52,11 +52,8 @@ site/beta_v_gamma_total.png: sir/total sir/batch.h5
 site/beta_v_gamma_duration.png: sir/duration sir/batch.h5
 	sir/duration sir/batch.h5 site/beta_v_gamma_duration.png
 
-site/index.html: index.adoc pipeline.adoc sir.adoc
+site/index.html: index.adoc
 	asciidoctor index.adoc -o $@
-
-site/pipeline.png: Makefile
-	makefile2dot -d LR | dot -Tpng > $@
 
 .PHONY: site
 site: \
@@ -70,7 +67,6 @@ site: \
 	site/beta_v_gamma_total.png \
 	site/beta_v_gamma_duration.png \
 	site/index.html \
-	site/pipeline.png
 	
 .PHONY: clean
 clean:

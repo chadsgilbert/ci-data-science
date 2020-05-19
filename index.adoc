@@ -2,146 +2,161 @@
 Chad Gilbert
 :stem:
 :eqnums:
-:toc:
 
-Here I walk though some simple studies in epidemiological dynamics by
-investigating several different epidemiological models, and anlysing key
-dynamics of these models using simulation. In the sections that follow, I will
-describe different ways of considering how an infectious disease can propagate
-through a population.
-
-== Goals
-
-Although have an amateur interest in understanding epidemiology, the true goal
-of this project is to practice and demonstrate a particular methodology for
-writing analytical reports based on computer simulation. The challenge with
-currently popular workflows for conducting and reporting on technical anlayses
-is that it is very easy to lose
-track of the process that was used to produce the analysis or report, to lose
-the ability to reproduce it, and to make mistakes that can never be recovered,
-checked, or revisited. Microsoft's Office desktop productivity suite is the
-worst offender, but even workflows using better tools can easily come up short
-of reproducibility and re-usability.
-
-There is no literature that I have been able to find that focuses on this kind
-of technical research for the Enterprise, though I'm sure many of the practices
-I'm trying to learn have been learned in industry before. However, the topic of
-reproducible research has recently become popular in academia. Two such books
-on the topic that are openly available are
-link:https://the-turing-way.netlify.com/[The Turing Way] and
-link:https://www.practicereproducibleresearch.org/[The Practice of Reproducible
-Research]. Although these books frame the problem in a way that is not exactly
-aligned with my own interests, they both highlight many of the same challenges
-that I am concerned with, and provide excellent guidance on solving some of the
-issues. I owe several of the lessons used here to those books.
-
-== General Approach
-
-The simplest way to ensure an analysis is reproducible is to frequently try to
-reproduce it from scratch. And the only way to make that acceptable is to
-automate it. So the general idea is very simple: we need to automate the
-simulations, automate post-processing of the simulations to produce figures and
-tables, and automate production of the document.
-
-Even with the process automated, there are a lot of variables that can thwart
-attempts to reproduce an analysis. The result can change or the software can
-just plain fail unless the same versions of the data, content, software,
-operating system and sometimes even hardware are different. There are two
-possible approaches to supporting a reproduction: one, make it possible to
-obtain the exact same configuration, or two make the analysis such that it works
-the same on other configurations. The particular solution to the problem is
-different for each of the different kinds of input.
-
-=== Data
-
-If data are used which cannot be reproduced, they should be stored somewhere
-known, where there is a single source of truth for it, and it should be
-immutable. There are internet archives designed for managing this, as well as
-specialized tools such as link:https://dvc.org[DVC], which claim to solve this
-problem. I believe in some cases, something as simple as a zip archive stored 
-on a web server with a known URI can be appropriate. Storage on a file system
-is less trustworthy, because it is hard to ensure that the data are never
-changed.
-
-One way to support assurance that a dataset is identical to the one previously
-used is to store a checksum of the dataset
-along side, and to store the checksum somewhere in the project, perhaps even
-reporting it in the document. Then, when
-reproducing the analysis, it is easy to verify a matching checksum.
-
-The models in this repository are all simple and not trained from any real-world
-data, so this project does not demonstrate an approach to managing
-irreproducible data that might come from tests, trials or experiments conducted
-live in the real world on real systems.
-
-=== Content
-
-The content is anything and everything that is a part of the analysis for the
-project. This is likely to include program source code and the text of the
-report. The most popular tool for versioning this kind of content is `git`.
-
-Dubbed by its creator as "the stupid content tracker", git is useful for keeping
-track of and identifying any collection of files. Any kind of file can be
-tracked in a git repository, no complicated software has to be installed to
-use it, and no connectivity to an online service is required. In contrast to
-science, which is typically done out in the open on purpose, there are other
-types of analytical computing that has to be conducted entirely on a corporate
-premises, or even across an "air gap", with no internet connectivity of any
-kind. Using git to track such work is particularly useful, because it is capable
-of reconstructing and reconciling changes, even across an air gap.
-
-Although git can track any kind of content, I believe that reproducibility is
-best achieved when only plain text content that was typed by a human be tracked.
-With plain text, there is no question as to how it was produced. The author sat
-at a text editor or terminal and entered the content. This is in contrast to
-content that may have been made by a GUI. Whether the resulting file is binary
-or "human-readable" text such as a xml file, it is very difficult to infer
-whether the author's intent is truly consistent with the product that arrives
-on disk. In the name of pragmatism, I don't believe this principle should always
-be kept as a strict rule; but I believe it is a gold standard to strive to. This
-example repository will consist only of plan text typed by the author.
-
-To support sharing of the content, plus integration with useful tools like
-Continuous Integration and Continuous Deployment pipelines a service such as
-GitHub or GitLab can be used. This project uses GitHub with GitHub Actions, and
-serves the site on GitHub Pages. This page is build from the GitHub repository
-https://github.com/chadsgilbert/ci-data-science[here].
-
-=== Software
-
-Whereas custom code that supports the analysis should be stored as source in
-git, it doesn't make sense to track third-party software in the same way.
-When using open source software, there are fantastic packaging ecosystems that
-can make it easy to install. Proprietary software can be more difficult. In
-this repository, only open source software is used. It will use python on
-Linux, with third-party libraries. Python's standard package management server,
-`pypi`, is used with `pip` to install third-party dependencies.
-
-=== Operating System
-
-The operating system provides the services and libraries required to run the
-software, and thus has to be considered in order to support reproducibility.
-Virtualization or containerization technologies can both support this to some
-extent. How this can all be managed is a large complex topic. In this project,
-I sidestep most of that by using GitHub actions, which provides a reliable
-environment. It isn't perfect, however. It is conceivalbe that software
-updates applied to the virtual machines could change a low level library and
-alter the behaviour of my code or other software. Reproducibility is a
-matter of degree.
-
-=== Hardware
-
-The hardware that supports the computation here is commodity hardware, a
-standard `x86_46` CPU should be quite reliable in producing the same results
-*if* we can actually manage to run the same software on it. This is not
-something that can always be taken for granted, but it is a reliable assumption
-for the kind of analysis I am doing.
-
-== Analysis Pipeline
-
-include::pipeline.adoc[]
+With the COVID-19 pandemic keeping me inside, I thought I would create some
+simulations to explore some dynamics in epidemiology.
 
 == The Susceptible, Infected, Recovered (SIR) Model
 
-include::sir.adoc[]
+The first model idealizes a disease like measles, mumps or rubella, in which
+people who have recovered from it maintain immunity for the rest of their
+life.
+
+Let stem:[S] be a real number in the range stem:[\[0,1\]] representing the
+proportion of the population
+that is susceptible to the disease. They are healthy and have no immunity
+against the disease. In this model, we will assume that all people in the
+population are equally likely to get the disease and none of them are immune to
+it.
+
+Let stem:[I] be a real number in the range stem:[\[0, 1\]] representing the
+propotion of the population
+that is currently infected with the disease.
+
+Let stem:[R] be a real number in the range stem:[\[0, 1\]] representing the
+proportion of the population
+that has recovered from the disease. These people are no lnger contagious,
+meaning they can no longer get anyone else sick, and they are immune to the
+disease, so they can't get it again.
+
+The the rates at which people transition from susceptible (stem:[S]) to
+infected (stem:[I]) to recovered (stem:[R]) is described by the following
+equations:
+
+[latexmath]
+++++
+\frac{dS}{dt} = -\beta I S \\
+\frac{dI}{dt} = \beta I S - \gamma I \\
+\frac{dR}{dt} = \gamma I
+++++
+
+where stem:[S + I + R = 1].
+
+In this analysis, we will start by assuming that stem:[\beta] and stem:[\gamma]
+are constant. Note that stem:[\beta] and stem:[\gamma] have dimension of inverse
+time. So stem:[\beta] can be thought of as the rate at which infected
+people infect susceptible people, and stem:[\gamma] as the rate at which
+infected people recover.
+
+=== Basic Dynamics
+
+The basic dynamics of the S-I-R model are easy to understand. Imagine a
+population shortly after the introduction of a new disease where at time
+stem:[t = 0], stem:[1\%] of the population has been infected and stem:[99\%] are
+still susceptible.
+
+Since the rate of infection is proportional to the number of suscteptible people
+and the number of infected people, the number of infected people increases
+itself at an increasing rate. As people recover and become immune, the numbers
+both of infected and susceptible people are reduced, and therefore the rate of
+new infections that appear also begins to shrink.
+
+How quick the spread and how many people get infected depend on the values of
+both stem:[\beta] and stem:[\gamma]. If it clear that if stem:[\gamma < \beta],
+there will not be a pandemic, because the number of infections will immediately
+begin shrinking. To illustrate this, first consider the horrible case where
+stem:[\gamma = 0] so we can see what happens when nobody recovers.
+
+<<sir_case_0,{figure-caption} {counter:refnum}>> shows the dynamic where
+stem:[\beta = 0.05] and stem:[\gamma = 0.00]. Since nobody ever recovers, the
+rate of increase of infected people is identical to the rate of decrease of the
+number of susceptible people. Both follow a logistic curve.
+
+[#sir_case_0]
+[title=' - stem:[\beta = 0.05] and stem:[\gamma = 0.00]']
+image::case0.png[caption='{figure-caption} {counter:refnum}']
+
+<<sir_case_1,{figure-caption} {counter:refnum}>> shows the dynamic for
+stem:[\beta = 0.04] and stem:[\gamma = 0.01]. The portion of the population with
+the infection increases early on and then levels out after 180 days. At day 180,
+stem:[42\%] of the population has the disease. At this point, with more people
+recovering and becoming immune, the rate at which new recoveries occur becomes
+greater than the rate at which new infection occur. After more than a year,
+almost everyone in the population will have been infected at some point.
+
+[#sir_case_1]
+[title=' - stem:[\beta = 0.04] and stem:[\gamma = 0.01]']
+image::case1.png[caption='{figure-caption} {counter:refnum}']
+
+<<sir_case_2,{figure-caption} {counter:refnum}>> shows the dynamic for
+stem:[\beta = 0.08] and stem:[\gamma = 0.04]. This time the portion of
+simultaneously infected people peaks earlier after about 100 days, with
+stem:[17 \%] of the population sick at the same time. In the limit, about
+stem:[80 \%] of the population will have been infected at some point.
+
+[#sir_case_2]
+[title=' - stem:[\beta = 0.08] and stem:[\gamma = 0.04]']
+image::case2.png[caption='{figure-caption} {counter:refnum}']
+
+At this point it should be pretty clear, both from mathematical analysis of the
+equations, and from a superficial analysis of the individual simulations in
+cases 0 through 2, that the stem:[\beta] and stem:[\gamma] control:
+
+  1. the portion of the population that becomes sick simultaneously; and
+  2. the portion of the population the gets sick eventually;
+  3. the duration of the pandemic.
+
+The the sections that follow, we compare the effects of different stem:[\beta]
+and stem:[\gamma] on these key measures.
+
+=== The Flatness of the Curve
+
+During news coverage on COVID-19, there has been lots of talk about "flattening
+the curve". Remembering that the only purpose of this document is to use a very
+simplistic model as a toy to demonstrate how to create reproducible simulations
+and analyses, not as an attempt to make any recommendations about or even
+provide insight into the present pandemic, it is nonetheless clear why we should
+want to look at the portion of the population who become infected at the same
+time. Too many simultaneous infections puts an excessive load on the systems
+that care for the infected people who fall ill.
+
+Simulations were run for every combination of stem:[\beta] in stem:[{0.01, 0.02,
+0.03, 0.04, 0.05, 0.06, 0.07, 0.08, 0.09}] and stem:[\gamma] in stem:[{0.01,
+0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08. 0.09}]. For each combination, the
+maximum value of stem:[I] is reported in <<sir_max_simultaneous_infections,
+{figure-caption} {counter:refnum}>>.
+
+[#sir_max_simultaneous_infections]
+[title=' - the maximum percentage of simultaneous infections for combinations of stem:[\beta] and stem:[\gamma].']
+image::beta_v_gamma.png[caption='{figure-caption} {counter:refnum}', align="center"]
+
+For all cases when stem:[\gamma] is less than stem:[\beta], the maximum value is
+stem:[0.01], or 1%. This is because the portion of infections was started at
+stem:[I = 0], and immediately began to decrease. The approximate trend is that
+as the ratio stem:[\beta / \gamma] increases, so does the number of
+simultaneous infections. Interestingly, different stem:[\beta] and stem:[\gamma]
+still have similar values for the peak. For example, for stem:[\beta = 0.02] and
+stem:[\gamma = 0.01], the peak is 16%, and for stem:[\beta = 0.04] and
+stem:[\gamma = 0.02], the peaks is also 16%.
+
+=== Total Number of Infections
+
+There is also the question of how many people must become infected to achieve
+"herd immunity". Will everyone get sick? Or how many will be spared of the
+illness once enough have recovered and developed immunity?
+
+From the same simulations in the previous section, we can measure the total
+number of people having been infected. These are shown in
+<<sir_max_total_infections, {figure-caption} {counter:refnum}>>. Perhaps
+unsurprisingly, the relationship is similar.
+
+[#sir_max_total_infections]
+[title=' - the maximum percentage of total infections for combinations of stem:[\beta] and stem:[\gamma].']
+image::beta_v_gamma_total.png[caption='{figure-caption} {counter:refnum}', align="center"]
+
+=== Speed
+
+[#sir_duration]
+[title=' - the duration of the pandemic for combinations of stem:[\beta] and stem:[\gamma].']
+image::beta_v_gamma_duration.png[caption='{figure-caption} {counter:refnum}', align="center"]
 
