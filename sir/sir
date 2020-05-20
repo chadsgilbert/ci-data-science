@@ -9,7 +9,6 @@ See index.html#sir
 from sys import argv
 import argparse
 import numpy
-import matplotlib.pyplot as plt
 import h5py
 
 
