@@ -5,7 +5,7 @@ all: site
 .PHONY: setup
 CONDA_HOME=https://repo.continuum.io/miniconda
 setup:
-	sudo apt-get install asciidoctor
+	sudo apt-get update && sudo apt-get install -y asciidoctor
 	if ! hash conda 2> /dev/null; then \
 	    wget $(CONDA_HOME)/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh; \
 	    bash miniconda.sh -b -p $HOME/miniconda; \
